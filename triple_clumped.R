@@ -13,32 +13,29 @@ theme = theme(
 
 aron = read_xlsx("data/Aron2023.xlsx")
 kelson = read_xlsx("data/Kelson2023.xlsx", sheet = "data")
-guadix = read_xlsx("data/Triple_Clumped_Combined.xlsx", sheet = 1)
-guadix_triple = guadix[1:9, c(1:3, 14:16)]
-names(guadix_triple) = c("age", "ID", "T47", "dp18sw", "dp17sw", "Dp17sw")
-guadix_triple = guadix_triple |>
-  mutate(across(c("age", "T47"), as.numeric))
-guadix_clumped = guadix[13:28, c(1:3, 8)]
-names(guadix_clumped) = guadix_clumped[1,]
-guadix_clumped = guadix_clumped[-1,]
-guadix_clumped = guadix_clumped |>
-  mutate(across(c("Age", "T", "d18Osw"), as.numeric))
+triple = read_csv("out/Guadix_Dp17sw.csv")
+d18sw = read_csv("out/Guadix_d18sw.csv")
 bayes = read_csv("bayes/BASS_bayes_vary_evap.csv")
 bayes = bayes |>
   mutate(d18p_low = post_d18p - post_d18p_sd,
          d18p_high = post_d18p + post_d18p_sd)
 
 # dp18-DP17 ----
-p1 = ggplot(guadix_triple) +
-  geom_point(aes(x = dp18sw, y = Dp17sw, fill = T47),
+p1 = ggplot(triple, aes(x = dp18sw, y = Dp17sw)) +
+  geom_errorbar(aes(xmin = dp18sw - dp18sw_sd, xmax = dp18sw + dp18sw_sd),
+                linewidth = 0.1, width = 0, color = "grey80") +
+  geom_errorbar(aes(ymin = Dp17sw - Dp17sw_sd, ymax = Dp17sw + Dp17sw_sd),
+                linewidth = 0.1, width = 0, color = "grey80") +
+  geom_point(aes(fill = T47),
              shape = 21, size = 3) +
   scale_fill_distiller(palette = "RdBu") +
+  scale_y_continuous(limits = c(-200, 500)) +
   theme_bw() + theme +
   labs(x = expression(delta^"'18"*"O"[sw]*" (\u2030)"),
        y = expression(Delta^"'17"*"O"[sw]*" (per meg)"),
        fill = expression(paste("T"[Delta][47]*" (", degree, "C)")))
 
-p2 = ggplot(guadix_triple) +
+p2 = ggplot(triple) +
   geom_point(data = aron, aes(x = dp18p, y = Dp17p),
              shape = 22, size = 2, color = "gray90") +
   geom_point(aes(x = dp18sw, y = Dp17sw, fill = T47),
@@ -50,7 +47,7 @@ p2 = ggplot(guadix_triple) +
        y = expression(Delta^"'17"*"O"[sw]*" (per meg)"),
        fill = expression(paste("T"[Delta][47]*" (", degree, "C)")))
 
-p3 = ggplot(guadix_triple) +
+p3 = ggplot(triple) +
   geom_point(data = kelson, aes(x = dp18sw, y = Dp17sw),
              shape = 23, size = 2, color = "gray90") +
   geom_point(aes(x = dp18sw, y = Dp17sw, fill = age),

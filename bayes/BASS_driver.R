@@ -36,7 +36,7 @@ d = list(ages = ages,
 parms = c("d18p", "depth", "RH", "evap")
 
 system.time({post.clp = jags.parallel(d, NULL, parms, "bayes/BASS_bayes.R",
-                                      n.iter = 1e5, n.chains = 3, n.burnin = 5e4)})
+                                      n.iter = 2e5, n.chains = 3, n.burnin = 5e4)})
 
 View(post.clp$BUGSoutput$summary)
 for (i in 1:length(parms)) {
